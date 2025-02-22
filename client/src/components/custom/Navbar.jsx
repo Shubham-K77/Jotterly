@@ -8,7 +8,7 @@ const Navbar = () => {
   const theme = useSelector((state) => state.themeToggler.theme);
   const dispatch = useDispatch();
   return (
-    <div className="w-full h-[50vh] lg:h-[30vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center bg-transparent">
+    <div className="w-full h-[50vh] lg:h-[25vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center bg-transparent">
       <div
         className="w-[80%] lg:w-[20%] h-[20vh] mt-2 mb-2 lg:mt-0 lg:mb-0 bg-transparent hover:cursor-pointer"
         onClick={() => navigate("/")}
