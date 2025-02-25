@@ -31,7 +31,8 @@ userRouter.post("/register", async (req, res, next) => {
       emailOtp: otp,
     });
     res.status(201).send({
-      message: "New user created!",
+      message:
+        "Account created successfully! Please verify your email to complete registration.",
       code: 201, //Created
       status: "Success!",
       newUser,

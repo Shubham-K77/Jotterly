@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 //Generate OTP:
 const generateOtp = () => {
-  const otp = crypto.randomInt(0, 1000000);
+  const otp = crypto.randomInt(100000, 999999);
   return otp;
 };
 //Generate HexCode:
