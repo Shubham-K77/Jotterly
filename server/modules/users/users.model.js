@@ -28,7 +28,6 @@ const userSchema = mongoose.Schema(
     emailOtp: {
       type: Number,
       default: null,
-      required: [true, "Email OTP is compulsory for application!"],
     },
     passwordOtp: {
       type: Number,
