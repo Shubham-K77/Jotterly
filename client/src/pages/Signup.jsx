@@ -79,6 +79,7 @@ const Signup = () => {
       setPassword("");
       setConfirmPassword("");
       setLoading(false);
+      navigate("/verify");
     } catch (error) {
       setLoading(false);
       let message = error?.response.data.message || "Internal Server Error!";
@@ -97,7 +98,11 @@ const Signup = () => {
     >
       <Navbar />
       <div className="w-full h-[75vh] bg-transparent flex justify-center items-center">
-        <div className="w-[95%] lg:w-[25%] h-[70vh] rounded-md border-2 border-slate-300 shadow-sm flex flex-col justify-start items-start">
+        <div
+          className={`w-[95%] lg:w-[25%] rounded-md border-2 border-slate-300 shadow-sm flex flex-col justify-start items-start ${
+            error === true ? "h-[72vh]" : "h-[70vh]"
+          }`}
+        >
           <div className="mt-6 mb-4 ml-6 text-[1.75rem] font-semibold">
             Register
           </div>
@@ -189,7 +194,7 @@ const Signup = () => {
               "Register"
             )}
           </div>
-          <div className="w-[85%] ml-6 flex justify-center items-center mb-2">
+          <div className="w-[85%] ml-6 flex justify-center items-center mb-1">
             <div className="text-[1.05rem] font-semibold mr-2">
               Already have an account?
             </div>
@@ -200,6 +205,19 @@ const Signup = () => {
               onClick={() => navigate("/login")}
             >
               Login
+            </div>
+          </div>
+          <div className="w-[85%] ml-6 flex justify-center items-center">
+            <div className="text-[1.05rem] font-semibold mr-2">
+              Want to verify your account?
+            </div>
+            <div
+              className={`text-[1.05rem] font-semibold underline hover:cursor-pointer ${
+                theme === "light" ? "text-green-600" : "text-teal-400"
+              }`}
+              onClick={() => navigate("/verify")}
+            >
+              Veirfy
             </div>
           </div>
         </div>

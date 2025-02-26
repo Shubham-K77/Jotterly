@@ -10,8 +10,8 @@ const generateHash = async (password) => {
   const hash = await bcrypt.hash(password, salt);
   return hash;
 };
-const compareHash = async (hashPassword, password) => {
-  const isValid = await bcrypt.compare(hashPassword, password);
+const compareHash = async (password, hashPassword) => {
+  const isValid = await bcrypt.compare(password, hashPassword);
   return isValid;
 };
 //Export:
