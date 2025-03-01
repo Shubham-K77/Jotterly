@@ -4,6 +4,8 @@ import userModel from "./users.model.js";
 import { generateHash, compareHash } from "../../utils/hashGenerate.js";
 import { generateOtp } from "../../utils/otpGenerator.js";
 import generate from "../../utils/tokenGenerator.js";
+import tokenChecker from "../../middleware/tokenCheck.js";
+import sendMail from "../../utils/generateMail.js";
 
 //Configure:
 const userRouter = express.Router();
@@ -32,6 +34,7 @@ userRouter.post("/register", async (req, res, next) => {
     await userModel.findByIdAndUpdate(newUser._id, {
       emailOtp: otp,
     });
+    await sendMail("userCreate", newUser.email, otp);
     res.status(201).send({
       message:
         "Account created successfully! Please verify your email to complete registration.",
@@ -77,6 +80,44 @@ userRouter.post("/login", async (req, res, next) => {
       message: "Successfully verified",
       status: 200,
     });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500);
+    next(error);
+  }
+});
+//Get Logged In User Info:
+userRouter.get("/userInfo", tokenChecker, async (req, res, next) => {
+  try {
+    const userInfo = req.userData;
+    const userExists = await userModel
+      .findById(userInfo._id)
+      .select("-password");
+    if (!userExists) {
+      const error = new Error("LoggedIn user doesn't exist in the platform!");
+      res.status(403); //Forbidden
+      return next(error);
+    }
+    res
+      .status(200)
+      .send({ message: "User is LoggedIn!", status: 200, userExists });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500); //Internal-Error
+    next(error);
+  }
+});
+//Logout From System:
+userRouter.post("/logout", tokenChecker, async (req, res, next) => {
+  try {
+    req.userData = "";
+    res.cookie("userToken", "", {
+      httpOnly: true,
+      secure: false, //Development
+      sameSite: "strict",
+      maxAge: 0,
+    });
+    res.status(200).send({ message: "Logged-Out Successfully!", status: 200 });
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);

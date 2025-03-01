@@ -8,7 +8,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 const Verify = () => {
-  const [currentPhase, setCurrentPhase] = useState(true);
+  const [currentPhase, setCurrentPhase] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(
     "Email doesn't exist in the system"
