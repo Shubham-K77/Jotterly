@@ -7,13 +7,55 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { enqueueSnackbar } from "notistack";
+import axios from "axios";
+import { ImSpinner8 } from "react-icons/im";
 const Verify = () => {
   const [currentPhase, setCurrentPhase] = useState(false);
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(
-    "Email doesn't exist in the system"
-  );
+  const [otpError, setOtpError] = useState(false);
+  const [otpErrorMessage, setOtpErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const theme = useSelector((state) => state.themeToggler.theme);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  //To send email!
+  const sendMail = async () => {
+    setLoading(true);
+    try {
+      if (name.length < 10) {
+        setLoading(false);
+        setError(true);
+        setErrorMessage("Name must be at least 10 characters long!");
+        return enqueueSnackbar("Name must be at least 10 characters long!", {
+          variant: "error",
+        });
+      }
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        setLoading(false);
+        setError(true);
+        setErrorMessage("Please enter a valid email address!");
+        return enqueueSnackbar("Please enter a valid email address!", {
+          variant: "error",
+        });
+      }
+      const response = await axios.post(
+        "http://localhost:5555/api/v1/users/sendMail",
+        { name, email }
+      );
+      enqueueSnackbar(response.data.message, { variant: "success" });
+      setLoading(false);
+      setCurrentPhase(true);
+    } catch (error) {
+      let message = error?.response?.data.message || "Internal Server Error!";
+      enqueueSnackbar(message, { variant: "error" });
+      setError(true);
+      setErrorMessage(message);
+      setLoading(false);
+    }
+  };
   return (
     <div
       className={`w-full min-h-screen flex flex-col justify-start items-center ${
@@ -36,12 +78,19 @@ const Verify = () => {
             <input
               className="w-[85%] h-[7.5vh] p-2 text-[1.05rem] font-semibold rounded-md border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="ml-6 w-full mb-4">
             <input
               className="w-[85%] h-[7.5vh] p-2 text-[1.05rem] font-semibold rounded-md border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           {error && (
@@ -55,8 +104,13 @@ const Verify = () => {
                 ? "bg-sky-400 hover:bg-sky-500"
                 : "bg-indigo-700 hover:bg-indigo-800"
             }`}
+            onClick={() => sendMail()}
           >
-            Send OTP
+            {loading === false ? (
+              "Send OTP"
+            ) : (
+              <ImSpinner8 className="animate-spin" />
+            )}
           </div>
           {currentPhase && (
             <>
@@ -75,9 +129,9 @@ const Verify = () => {
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              {error && (
+              {otpError && (
                 <div className="text-[0.85rem] font-semibold mb-2 text-red-700 w-full flex justify-center items-center">
-                  {errorMessage}
+                  {otpErrorMessage}
                 </div>
               )}
               <div
