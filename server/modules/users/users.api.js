@@ -2,7 +2,7 @@
 import express from "express";
 import userModel from "./users.model.js";
 import { generateHash, compareHash } from "../../utils/hashGenerate.js";
-import { generateOtp } from "../../utils/otpGenerator.js";
+import { generateOtp, generateCode } from "../../utils/otpGenerator.js";
 import generate from "../../utils/tokenGenerator.js";
 import tokenChecker from "../../middleware/tokenCheck.js";
 import sendMail from "../../utils/generateMail.js";
@@ -34,7 +34,6 @@ userRouter.post("/register", async (req, res, next) => {
     await userModel.findByIdAndUpdate(newUser._id, {
       emailOtp: otp,
     });
-    await sendMail("userCreate", newUser.email, otp);
     res.status(201).send({
       message:
         "Account created successfully! Please verify your email to complete registration.",
@@ -118,6 +117,57 @@ userRouter.post("/logout", tokenChecker, async (req, res, next) => {
       maxAge: 0,
     });
     res.status(200).send({ message: "Logged-Out Successfully!", status: 200 });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500);
+    next(error);
+  }
+});
+//Verify The Account:
+userRouter.post("/sendMail", async (req, res, next) => {
+  try {
+    const { name, email } = req.body;
+    const userExists = await userModel.findOne({ email, name });
+    if (!userExists) {
+      const error = new Error("Email isn't found in the system!");
+      res.status(401); //Un-Authorized!
+      return next(error);
+    }
+    if (userExists.emailValidate === false) {
+      const validateMail = await sendMail(
+        "userCreate",
+        userExists.email,
+        userExists.emailOtp
+      );
+      if (!validateMail) {
+        const error = new Error("Internal Error! Mail Generation Failed!");
+        res.status(500);
+        return next(error);
+      }
+    } else {
+      const resetOtp = generateOtp();
+      const resetCode = generateCode();
+      const updateUser = await emailExists.findByIdAndUpdate(userExists._id, {
+        passwordOtp: resetOtp,
+        passwordResetCode: resetCode,
+      });
+      if (!updateUser) {
+        const error = new Error("Internal Error! DB Update Failed!");
+        res.status(500);
+        return next(error);
+      }
+      const updateMail = await sendMail(
+        "resetPassword",
+        updateUser.email,
+        updateUser.passwordOtp
+      );
+      if (!updateMail) {
+        const error = new Error("Internal Error! Mail Generation Failed!");
+        res.status(500);
+        return next(error);
+      }
+    }
+    res.status(200).send({ message: "Email delivered!", status: 200 });
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);

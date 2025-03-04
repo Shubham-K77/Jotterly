@@ -56,6 +56,7 @@ const sendMail = async (type, recipient, otpValue) => {
 </body>`,
       });
       console.log("Email Sent: %s", info.messageId);
+      return true; //Success
     } else {
       const info = await transporter.sendMail({
         from: '"Jotterly" <shubhamkadariya@gmail.com>',
@@ -93,10 +94,12 @@ const sendMail = async (type, recipient, otpValue) => {
     </body>`,
       });
       console.log("Email Sent: %s", info.messageId);
+      return true; //Success
     }
   } catch (error) {
     error.message = "Internal Server Error!";
     console.error(error);
+    return false; //Error
   }
 };
 
