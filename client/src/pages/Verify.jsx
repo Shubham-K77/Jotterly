@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import Navbar from "@/components/custom/Navbar";
 import { useSelector } from "react-redux";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import axios from "axios";
 import { ImSpinner8 } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
 const Verify = () => {
   const [currentPhase, setCurrentPhase] = useState(false);
   const [error, setError] = useState(false);
@@ -20,6 +20,8 @@ const Verify = () => {
   const theme = useSelector((state) => state.themeToggler.theme);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [otpValue, setOtpValue] = useState("");
+  const navigate = useNavigate();
   //To send email!
   const sendMail = async () => {
     setLoading(true);
@@ -46,6 +48,7 @@ const Verify = () => {
         { name, email }
       );
       enqueueSnackbar(response.data.message, { variant: "success" });
+      setError(false);
       setLoading(false);
       setCurrentPhase(true);
     } catch (error) {
@@ -53,6 +56,36 @@ const Verify = () => {
       enqueueSnackbar(message, { variant: "error" });
       setError(true);
       setErrorMessage(message);
+      setLoading(false);
+    }
+  };
+  const handleOtpChange = (value) => {
+    setOtpValue(value);
+  };
+  //Verify The Otp!
+  const verifyOtp = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "http://localhost:5555/api/v1/users/validate",
+        { name, email, otpValue }
+      );
+      let verify = response?.data?.verify;
+      if (verify === "email") {
+        enqueueSnackbar(response?.data?.message, { variant: "success" });
+        setLoading(false);
+        navigate("/login");
+      } else {
+        let resetCode = response?.data?.resetCode;
+        enqueueSnackbar(response?.data?.message, { variant: "success" });
+        setLoading(false);
+        navigate(`reset/${resetCode}`);
+      }
+    } catch (error) {
+      let message = error?.response?.data.message || "Internal Server Error!";
+      enqueueSnackbar(message, { variant: "error" });
+      setOtpErrorMessage(message);
+      setOtpError(true);
       setLoading(false);
     }
   };
@@ -118,7 +151,11 @@ const Verify = () => {
                 Please enter the OTP sent to your email.
               </div>
               <div className="ml-6 w-[85%] flex justify-center items-center mb-4">
-                <InputOTP maxLength={6}>
+                <InputOTP
+                  maxLength={6}
+                  value={otpValue}
+                  onChange={handleOtpChange}
+                >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} className="h-[7.5vh] shadow-sm" />
                     <InputOTPSlot index={1} className="h-[7.5vh] shadow-sm" />
@@ -140,6 +177,7 @@ const Verify = () => {
                     ? "bg-green-500 hover:bg-green-600"
                     : "bg-teal-400 hover:bg-teal-500"
                 }`}
+                onClick={() => verifyOtp()}
               >
                 Verify Account
               </div>

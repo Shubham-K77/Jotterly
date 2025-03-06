@@ -147,10 +147,14 @@ userRouter.post("/sendMail", async (req, res, next) => {
     } else {
       const resetOtp = generateOtp();
       const resetCode = generateCode();
-      const updateUser = await emailExists.findByIdAndUpdate(userExists._id, {
-        passwordOtp: resetOtp,
-        passwordResetCode: resetCode,
-      });
+      const updateUser = await userModel.findByIdAndUpdate(
+        userExists._id,
+        {
+          passwordOtp: resetOtp,
+          passwordResetCode: resetCode,
+        },
+        { new: true }
+      );
       if (!updateUser) {
         const error = new Error("Internal Error! DB Update Failed!");
         res.status(500);
@@ -170,6 +174,69 @@ userRouter.post("/sendMail", async (req, res, next) => {
     res.status(200).send({ message: "Email delivered!", status: 200 });
   } catch (error) {
     error.message = "Internal Server Error!";
+    res.status(500);
+    next(error);
+  }
+});
+//Validate The Otp:
+userRouter.post("/validate", async (req, res, next) => {
+  try {
+    const { name, email, otpValue } = req.body;
+    const userExists = await userModel.findOne({ email, name });
+    if (!userExists) {
+      const error = new Error("User Not Found!");
+      res.status(401); //Un-Authorized
+      return next(error);
+    }
+    if (userExists.emailValidate === false) {
+      const validOtp = userExists.emailOtp === Number(otpValue);
+      if (!validOtp) {
+        const error = new Error("Invalid Otp Entered!");
+        res.status(400); //Bad-Request
+        return next(error);
+      }
+      const updateUser = await userModel.findByIdAndUpdate(
+        userExists._id,
+        {
+          emailValidate: true,
+          emailOtp: null,
+        },
+        { new: true }
+      );
+      if (!updateUser) {
+        const error = new Error("Unable To Update The Validation!");
+        res.status(500); //Server
+        return next(error);
+      }
+      res.status(200).send({
+        message: "Successfully Validated!",
+        status: 200,
+        updateUser,
+        verify: "email",
+      });
+    } else {
+      const validOtp = userExists.passwordOtp === Number(otpValue);
+      if (!validOtp) {
+        const error = new Error("Invalid Otp Entered!");
+        res.status(400); //Bad-Request
+        return next(error);
+      }
+      const updateUser = await userModel.findByIdAndUpdate(
+        userExists._id,
+        {
+          passwordOtp: null,
+        },
+        { new: true }
+      );
+      res.status(200).send({
+        message: "Successfully Validated!",
+        status: 200,
+        resetCode: updateUser.passwordResetCode,
+        verify: "password",
+      });
+    }
+  } catch (error) {
+    error.message = "Internal Error!";
     res.status(500);
     next(error);
   }

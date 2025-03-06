@@ -58,7 +58,7 @@ const sendMail = async (type, recipient, otpValue) => {
       console.log("Email Sent: %s", info.messageId);
       return true; //Success
     } else {
-      const info = await transporter.sendMail({
+      const info = await mailConfig.sendMail({
         from: '"Jotterly" <shubhamkadariya@gmail.com>',
         to: recipient,
         subject: "Reset Your Password! 🔑",
