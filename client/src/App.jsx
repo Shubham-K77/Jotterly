@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Verify from "./pages/Verify";
+import Reset from "./pages/Reset";
 const App = () => {
   return (
     <Routes>
@@ -10,6 +11,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify" element={<Verify />} />
+      <Route path="/reset/:id" element={<Reset />} />
     </Routes>
   );
 };

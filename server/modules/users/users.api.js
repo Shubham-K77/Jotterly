@@ -241,5 +241,40 @@ userRouter.post("/validate", async (req, res, next) => {
     next(error);
   }
 });
+//Reset Password:
+userRouter.put("/reset/:id", async (req, res, next) => {
+  try {
+    const resetCode = req.params.id;
+    const { password } = req.body;
+    if (!resetCode) {
+      const error = new Error("No Reset Code Available!");
+      res.status(401); //Un-Authorized
+      return next(error);
+    }
+    const userExists = await userModel.findOne({
+      passwordResetCode: resetCode,
+    });
+    if (!userExists) {
+      const error = new Error("User Wasn't Found!");
+      res.status(403); //Forbidden
+      return next(error);
+    }
+    const hashPassword = await generateHash(password);
+    const updateUser = await userModel.findByIdAndUpdate(userExists._id, {
+      password: hashPassword,
+      passwordResetCode: "",
+    });
+    if (!updateUser) {
+      const error = new Error("Internal DB Error!");
+      res.status(500); //Internal-Error
+      return next(error);
+    }
+    res.status(200).send({ message: "Successfully Reset!", status: 200 });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500); //Internal-Error
+    next(error);
+  }
+});
 //Export:
 export default userRouter;
