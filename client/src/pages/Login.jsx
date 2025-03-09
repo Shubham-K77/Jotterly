@@ -22,12 +22,13 @@ const Login = () => {
       setLoading(true);
       const response = await axios.post(
         "http://localhost:5555/api/v1/users/login",
-        { email, password }
+        { email, password },
+        { withCredentials: true }
       );
       let message = response.data.message;
       enqueueSnackbar(message, { variant: "success" });
       setLoading(false);
-      navigate("/");
+      navigate("/main");
     } catch (error) {
       let message = error?.response.data.message || "Internal Server Error!";
       enqueueSnackbar(message, { variant: "error" });

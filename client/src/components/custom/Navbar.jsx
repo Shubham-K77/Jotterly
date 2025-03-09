@@ -22,11 +22,11 @@ const Navbar = () => {
         }}
       ></div>
       <div
-        className="lg:w-[8%] w-[34%] h-[6vh] bg-transparent rounded-3xl mb-2 lg:mb-0 flex justify-around items-start hover:cursor-pointer transition-all ease-in-out duration-200 border-2 border-slate-200"
+        className="lg:w-[8%] w-[34%] h-[6vh] bg-transparent rounded-lg drop-shadow-sm mb-2 lg:mb-0 flex justify-around items-start hover:cursor-pointer transition-all ease-in-out duration-200"
         onClick={() => dispatch(themeToggler())}
       >
         <div
-          className={`flex justify-center items-center w-[50%] h-[5.5vh] rounded-l-3xl pb-0.5 ${
+          className={`flex justify-center items-center w-[50%] h-[5.5vh] rounded-l-lg pb-0.5 ${
             theme === "light"
               ? "bg-amber-400"
               : "hover:bg-amber-400 hover:text-black"
@@ -35,7 +35,7 @@ const Navbar = () => {
           <FiSun className="text-[1.5rem] font-semibold" />
         </div>
         <div
-          className={`flex justify-center items-center w-[50%] h-[5.5vh] pb-0.5 rounded-r-3xl ${
+          className={`flex justify-center items-center w-[50%] h-[5.5vh] pb-0.5 rounded-r-lg ${
             theme === "dark"
               ? "bg-slate-700 text-white"
               : "hover:bg-gray-700 hover:text-white"
