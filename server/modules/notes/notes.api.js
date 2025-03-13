@@ -105,7 +105,7 @@ noteRouter.delete("/delete", tokenChecker, async (req, res, next) => {
   }
 });
 //AI Suggestion:
-noteRouter.post("/suggest", async (req, res, next) => {
+noteRouter.post("/suggest", tokenChecker, async (req, res, next) => {
   try {
     const apiUrl = process.env.gorqAIUrl;
     const apiKey = process.env.gorqAPIKey;
@@ -156,13 +156,11 @@ Response format:
     }
     const suggest = response.data.choices[0].message.content;
     let parsedSuggestion = JSON.parse(suggest);
-    res
-      .status(200)
-      .send({
-        message: "Suggestions generated!",
-        code: 200,
-        suggestion: parsedSuggestion,
-      });
+    res.status(200).send({
+      message: "Suggestions generated!",
+      code: 200,
+      suggestion: parsedSuggestion,
+    });
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);
