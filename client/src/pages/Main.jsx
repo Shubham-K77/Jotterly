@@ -1,5 +1,6 @@
 import LoginNavbar from "@/components/custom/LoginNavbar";
 import { useSelector } from "react-redux";
+import NotesDisplay from "@/components/custom/NotesDisplay";
 const Main = () => {
   const theme = useSelector((state) => state.themeToggler.theme);
   return (
@@ -11,6 +12,9 @@ const Main = () => {
       }`}
     >
       <LoginNavbar />
+      <div className="w-full flex flex-wrap flex-col justify-start items-center lg:flex-row lg:justify-evenly lg:items-start p-2 mt-6 mb-4">
+        <NotesDisplay />
+      </div>
     </div>
   );
 };
