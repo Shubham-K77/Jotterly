@@ -1,6 +1,6 @@
 import Navbar from "../components/custom/Navbar";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
@@ -17,6 +17,20 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  //Check If User Is LoggedIn:
+  useEffect(() => {
+    const retrieveUserInfo = async () => {
+      let response = await axios.get(
+        "http://localhost:5555/api/v1/users/userInfo",
+        { withCredentials: true }
+      );
+      if (response) {
+        enqueueSnackbar("The user is already logged in.", { variant: "info" });
+        return navigate("/main");
+      }
+    };
+    retrieveUserInfo();
+  }, [enqueueSnackbar, navigate]);
   const loginRequest = async () => {
     try {
       setLoading(true);

@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import { IoIosSearch } from "react-icons/io";
-import { CiLight } from "react-icons/ci";
-import { CiDark } from "react-icons/ci";
+import { FiSun } from "react-icons/fi";
+import { LuMoonStar } from "react-icons/lu";
 import { themeToggler } from "../../../slices/themeSlice/theme";
 import { useSnackbar } from "notistack";
 import { loggedInUser } from "../../../slices/userSlice/User";
@@ -137,16 +137,16 @@ const LoginNavbar = () => {
             {/* Your Own Div */}
             <div className="w-full justify-evenly items-center">
               <div className="text-[1.05rem]">Name:</div>
-              <div className="text-[1.05rem]">{userData.name}</div>
+              <div className="text-[1.05rem]">{userData?.name}</div>
             </div>
             <div className="w-full justify-center items-center">
               <div className="mr-2 text-[1.05rem]">Email Address:</div>
-              <div className="text-[1.05rem]">{userData.email}</div>
+              <div className="text-[1.05rem]">{userData?.email}</div>
             </div>
             <div className="w-full justify-center items-center">
               <div className="text-[1.05rem]">Email Validation:</div>
               <div className="text-[1.05rem]">
-                {userData.emailValidate === true
+                {userData?.emailValidate === true
                   ? "✔️ Verified"
                   : "❌ Unverified"}
               </div>
@@ -178,19 +178,19 @@ const LoginNavbar = () => {
             className={`w-[50%] h-[5.5vh] flex justify-center items-center rounded-l-lg ${
               theme === "light"
                 ? "bg-amber-400 text-black"
-                : "bg-transparent text-white hover:bg-amber-400 hover:text-black"
+                : "bg-transparent text-white hover:bg-amber-300 hover:text-black"
             }`}
           >
-            <CiLight className="font-bold text-[1.85rem]" />
+            <FiSun className="font-bold text-[1.35rem]" />
           </div>
           <div
             className={`w-[50%] h-[5.5vh] flex justify-center items-center rounded-r-lg ${
               theme === "light"
-                ? "bg-transparent text-black hover:bg-gray-500 hover:text-white"
-                : "bg-gray-500 text-white"
+                ? "bg-transparent text-black hover:bg-gray-900 hover:text-white"
+                : "bg-gray-700 text-white"
             }`}
           >
-            <CiDark className="font-bold text-[1.75rem]" />
+            <LuMoonStar className="font-bold text-[1.35rem]" />
           </div>
         </div>
       </div>
