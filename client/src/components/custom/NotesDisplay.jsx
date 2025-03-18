@@ -22,7 +22,7 @@ const NotesDisplay = () => {
     "Booked an appointment in Frontline Hospital for hand fracture that I suffered in 10th March 2025";
   const theme = useSelector((state) => state.themeToggler.theme);
   return (
-    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm hover:backdrop-blur-sm w-[95%] h-[38vh] lg:w-[30%] lg:h-[30vh] rounded-md mb-6 border-1 border-gray-300">
+    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[38vh] lg:w-[30%] lg:h-[30vh] rounded-md mb-6 border-1 border-gray-300">
       {/* Title Name And Pin */}
       <div className="w-full flex justify-around items-center mb-2 p-2 mt-2">
         <div className="ml-2 text-[1.10rem] font-semibold">
