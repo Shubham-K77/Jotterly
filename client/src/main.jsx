@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import store from "../slices/store.js";
 import { Provider } from "react-redux";
@@ -8,13 +7,11 @@ import { BrowserRouter } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      </BrowserRouter>
-    </Provider>
-  </StrictMode>
+  <Provider store={store}>
+    <BrowserRouter>
+      <SnackbarProvider>
+        <App />
+      </SnackbarProvider>
+    </BrowserRouter>
+  </Provider>
 );

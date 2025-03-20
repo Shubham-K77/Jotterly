@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 //Router:
 const noteRouter = express.Router();
 dotenv.config();
-//Get The Notes:
+//Get ALL The Notes:
 noteRouter.get("/", tokenChecker, async (req, res, next) => {
   try {
     const userInfo = req.userData; //Logged In User
@@ -32,6 +32,36 @@ noteRouter.get("/", tokenChecker, async (req, res, next) => {
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500); //Internal Error
+    next(error);
+  }
+});
+//Get The User Notes:
+noteRouter.get("/getNotes/:userId", tokenChecker, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      const error = new Error("Credential Missing For Request!");
+      res.status(400); //Bad-Request
+      return next(error);
+    }
+    const userExists = await userModel.findById(userId);
+    if (!userExists) {
+      const error = new Error("User Not Found!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    const fetchData = await noteModel
+      .find({ userId: userId })
+      .sort({ isPinned: -1 });
+    if (!fetchData) {
+      const error = new Error("Data Not Found In DB!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    res.status(200).send({ message: "Data Fetched!", code: 200, fetchData });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500);
     next(error);
   }
 });
@@ -64,6 +94,59 @@ noteRouter.post("/create", tokenChecker, async (req, res, next) => {
     res
       .status(201)
       .send({ message: "New note has been created!", status: 201, createNote });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500);
+    next(error);
+  }
+});
+//Pin The Note:
+noteRouter.patch("/pinNote", tokenChecker, async (req, res, next) => {
+  try {
+    const { userId, noteId } = req.body;
+    if (!userId || !noteId) {
+      const error = new Error("Credentials Missing For Request!");
+      res.status(400); //Bad-Request
+      return next(error);
+    }
+    const userExists = await userModel.findById(userId);
+    if (!userExists) {
+      const error = new Error("User Doesn't Exist!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    const noteExists = await noteModel.findById(noteId);
+    if (!noteExists) {
+      const error = new Error("Note Doesn't Exist!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    const noteByUser = await noteModel.find({
+      _id: noteExists._id,
+      userId: userExists._id,
+    });
+    if (!noteByUser) {
+      const error = new Error(
+        "Access Denied! You are not the creator of this note."
+      );
+      res.status(403); //Forbidden
+      return next(error);
+    }
+    const updateNote = await noteModel.findByIdAndUpdate(
+      noteExists._id,
+      { isPinned: !noteExists.isPinned },
+      { new: true }
+    );
+    if (!updateNote) {
+      const error = new Error("Internal Database Error!");
+      res.status(500);
+      return next(error);
+    }
+    let message =
+      updateNote.isPinned === true
+        ? "Note has been pinned!"
+        : "Note has been unpinned!!";
+    res.status(200).send({ message, code: 200, updateNote });
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);

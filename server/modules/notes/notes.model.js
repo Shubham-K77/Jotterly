@@ -19,6 +19,10 @@ const noteSchema = mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, //Object For Suggestions
       default: {}, //Empty Object
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "User Must Be Specified For The Note!"],

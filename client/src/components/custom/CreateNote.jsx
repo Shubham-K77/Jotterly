@@ -76,7 +76,7 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div
-          className={`absolute bottom-3 lg:bottom-5 lg:right-[3.5rem] right-4 mt-2 w-[14%] lg:w-[3.5%] h-[7vh] rounded-sm flex justify-center items-center ${
+          className={`fixed bottom-3 lg:bottom-5 lg:right-[3.5rem] right-4 mt-2 w-[14.5%] lg:w-[4%] h-[7.5vh] rounded-sm flex justify-center items-center ${
             theme === "light"
               ? "bg-sky-700 hover:bg-sky-600"
               : "bg-rose-400 hover:bg-rose-300"
