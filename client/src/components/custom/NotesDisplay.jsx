@@ -19,7 +19,7 @@ const NotesDisplay = ({ data, pinNote, loading }) => {
   let date = new Date(data.createdAt).toLocaleString();
   const theme = useSelector((state) => state.themeToggler.theme);
   return (
-    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[40vh] lg:w-[30%] lg:h-[30vh] rounded-md mb-8 border-1 border-gray-300">
+    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[45vh] lg:w-[30%] lg:h-[33vh] rounded-md mb-8 border-1 border-gray-300">
       {/* Title Name And Pin */}
       <div className="w-full flex justify-around items-center mb-2 p-2 mt-2">
         <div className="ml-2 text-[1.10rem] font-semibold">{data.title}</div>
@@ -55,6 +55,14 @@ const NotesDisplay = ({ data, pinNote, loading }) => {
       {/* Description */}
       <div className="ml-4 mb-2 text-[1rem] font-semibold">
         {data.content.substring(0, 52) + " ..."}
+      </div>
+      {/* Category */}
+      <div
+        className={`ml-4 mb-2 flex justify-center items-center rounded-sm w-[28%] h-[6.5vh] lg:w-[20%] shadow-sm ${
+          theme === "light" ? "bg-sky-700" : "bg-rose-400"
+        }`}
+      >
+        <div className="text-[1.05rem] text-white font-semibold">IdeaBox</div>
       </div>
       {/* Tags and Icons */}
       <div className="ml-4 w-full mb-2 flex flex-col justify-start items-start lg:flex-row lg:justify-around lg:items-center">

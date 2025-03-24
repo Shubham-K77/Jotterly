@@ -17,6 +17,7 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState("");
   const [tags, setTags] = useState([]);
   const [singleTag, setSingleTag] = useState("");
   //Add Tags
@@ -38,7 +39,7 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
   };
   //Check Data Before Create:
   const checkData = () => {
-    if (!title || !content) {
+    if (!title || !content || !category) {
       setTitle("");
       setContent("");
       setTags([]);
@@ -66,7 +67,7 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
         variant: "error",
       });
     }
-    create(title, content, tags);
+    create(title, content, category, tags);
     //Reset After Function Call:
     setTitle("");
     setContent("");
@@ -125,6 +126,26 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
         <div className="w-full text-end mr-2 text-gray-400 font-semibold text-[0.85rem]">
           {content.length}/500
         </div>
+        {/*Categories Title*/}
+        <div className="text-left ml-2 text-[0.95rem] font-semibold text-gray-400">
+          CATEGORY
+        </div>
+        {/* Categories Select */}
+        <select
+          className="w-[85%] ml-2 h-[6.5vh] text-[0.95rem] font-semibold border-1 border-gray-300 p-1"
+          required
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="" selected disabled>
+            Select Category
+          </option>
+          <option value="IdeaBox">IdeaBox</option>
+          <option value="LifeCraft">LifeCraft</option>
+          <option value="StudyNest">StudyNest</option>
+          <option value="ZenDen">ZenDen</option>
+          <option value="WorkFlow">WorkFlow</option>
+        </select>
         {/* Tag Title */}
         <div className="mt-2 text-left ml-2 text-[0.90rem] text-gray-400 font-semibold">
           TAGS

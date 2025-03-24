@@ -19,6 +19,11 @@ const noteSchema = mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, //Object For Suggestions
       default: {}, //Empty Object
     },
+    categories: {
+      type: String,
+      enum: ["IdeaBox", "LifeCraft", "StudyNest", "ZenDen", "WorkFlow"],
+      required: [true, "Category For The Notes Is Compulsory!"],
+    },
     isPinned: {
       type: Boolean,
       default: false,

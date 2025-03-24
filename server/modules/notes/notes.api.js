@@ -68,8 +68,8 @@ noteRouter.get("/getNotes/:userId", tokenChecker, async (req, res, next) => {
 //Create New Note:
 noteRouter.post("/create", tokenChecker, async (req, res, next) => {
   try {
-    const { title, content, tags, userId } = req.body;
-    if (!title || !content || !userId) {
+    const { title, content, category, tags, userId } = req.body;
+    if (!title || !content || !userId || !category) {
       const error = new Error("Critical information is missing!");
       res.status(400); //Bad-Request
       return next(error);
@@ -83,6 +83,7 @@ noteRouter.post("/create", tokenChecker, async (req, res, next) => {
     const createNote = await noteModel.create({
       title,
       content,
+      categories: category,
       tags,
       userId,
     });

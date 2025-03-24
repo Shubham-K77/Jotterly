@@ -5,6 +5,7 @@ import CreateNote from "@/components/custom/CreateNote";
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import axios from "axios";
+import Banner from "@/components/custom/Banner";
 const Main = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useSelector((state) => state.themeToggler.theme);
@@ -13,18 +14,24 @@ const Main = () => {
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState([]);
   //Create New Note:
-  const create = async (title, content, tags) => {
+  const create = async (title, content, category, tags) => {
     setLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:5555/api/v1/notes/create",
-        { title, content, tags, userId: user._id },
+        { title, content, category, tags, userId: user._id },
         { withCredentials: true }
       );
       enqueueSnackbar(response?.data?.message || "Successfully Created!", {
         variant: "success",
       });
       setOpen(false);
+      // Fetch updated notes after pinning
+      const updatedNotes = await axios.get(
+        `http://localhost:5555/api/v1/notes/getNotes/${user._id}`,
+        { withCredentials: true }
+      );
+      setNotes(updatedNotes?.data?.fetchData);
       return setLoading(false);
     } catch (error) {
       let message = error.response?.data?.message || "Internal Server Error!";
@@ -33,7 +40,6 @@ const Main = () => {
       return setLoading(false);
     }
   };
-  console.log(user._id);
   // Fetch Notes On Render:
   useEffect(() => {
     const fetchData = async () => {
@@ -86,7 +92,16 @@ const Main = () => {
           : "bg-gray-900 text-gray-100"
       }`}
     >
+      {/* Navigation Bar */}
       <LoginNavbar />
+      {/* Banner Display */}
+      <Banner
+        image={"/Images/mainBanner.png"}
+        desc={
+          "Capture, organize, and elevate your thoughts—your personal space for ideas, tasks, learning, well-being, and productivity."
+        }
+      />
+      {/* Display Notes */}
       {notes && notes.length > 0 ? (
         <div className="flex flex-col justify-start items-center lg:flex-row lg:flex-wrap lg:justify-evenly lg:items-center w-full mt-6">
           {notes.map((note) => (
@@ -109,11 +124,12 @@ const Main = () => {
               backgroundSize: "cover",
             }}
           ></div>
-          <div className="w-[85%] lg:w-full flex justify-center items-center text-[1.25rem] font-semibold mb-2 text-center">
+          <div className="w-[85%] lg:w-full flex justify-center items-center text-[1.05rem] font-semibold mb-2 text-center">
             Create your first note by clicking the + button to get started!
           </div>
         </div>
       )}
+      {/* Create Button */}
       <CreateNote
         theme={theme}
         create={create}
