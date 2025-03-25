@@ -132,7 +132,11 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
         </div>
         {/* Categories Select */}
         <select
-          className="w-[85%] ml-2 h-[6.5vh] text-[0.95rem] font-semibold border-1 border-gray-300 p-1"
+          className={`w-[85%] ml-2 h-[6.5vh] text-[0.95rem] font-semibold border-1 border-gray-300 p-1 rounded-sm hover:cursor-pointer ${
+            theme === "light"
+              ? "bg-gray-100 text-gray-900"
+              : "bg-gray-900 text-gray-100"
+          }`}
           required
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -140,11 +144,11 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
           <option value="" selected disabled>
             Select Category
           </option>
-          <option value="IdeaBox">IdeaBox</option>
-          <option value="LifeCraft">LifeCraft</option>
-          <option value="StudyNest">StudyNest</option>
-          <option value="ZenDen">ZenDen</option>
-          <option value="WorkFlow">WorkFlow</option>
+          <option value="IdeaBox">IdeaBox💡</option>
+          <option value="LifeCraft">LifeCraft⛺</option>
+          <option value="StudyNest">StudyNest🧠</option>
+          <option value="ZenDen">ZenDen☮️</option>
+          <option value="WorkFlow">WorkFlow💼</option>
         </select>
         {/* Tag Title */}
         <div className="mt-2 text-left ml-2 text-[0.90rem] text-gray-400 font-semibold">

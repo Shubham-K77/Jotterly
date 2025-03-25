@@ -6,12 +6,14 @@ import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import axios from "axios";
 import Banner from "@/components/custom/Banner";
+import Categories from "@/components/custom/Categories";
 const Main = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useSelector((state) => state.themeToggler.theme);
   const user = useSelector((state) => state.userState.userData);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [notes, setNotes] = useState([]);
   //Create New Note:
   const create = async (title, content, category, tags) => {
@@ -83,6 +85,33 @@ const Main = () => {
       setLoading(false);
     }
   };
+  // Delete The Notes:
+  const deleteNote = async (postId) => {
+    setLoading(true);
+    try {
+      const response = await axios.delete(
+        "http://localhost:5555/api/v1/notes/delete",
+        {
+          data: { postId },
+          withCredentials: true,
+        }
+      );
+      enqueueSnackbar(response?.data?.message, { variant: "success" });
+      setOpenDeleteDialog(false);
+      // Fetch updated notes after deleting
+      const updatedNotes = await axios.get(
+        `http://localhost:5555/api/v1/notes/getNotes/${user._id}`,
+        { withCredentials: true }
+      );
+      setNotes(updatedNotes?.data?.fetchData);
+      return setLoading(false);
+    } catch (error) {
+      let message = error?.response?.data?.message || "Internal Server Error!";
+      enqueueSnackbar(message, { variant: "error" });
+      setLoading(false);
+      setOpenDeleteDialog(false);
+    }
+  };
 
   return (
     <div
@@ -94,6 +123,8 @@ const Main = () => {
     >
       {/* Navigation Bar */}
       <LoginNavbar />
+      {/* Categories Display */}
+      <Categories />
       {/* Banner Display */}
       <Banner
         image={"/Images/mainBanner.png"}
@@ -110,6 +141,9 @@ const Main = () => {
               data={note}
               pinNote={pinNote}
               loading={loading}
+              deleteNote={deleteNote}
+              open={openDeleteDialog}
+              setOpen={setOpenDeleteDialog}
             />
           ))}
         </div>

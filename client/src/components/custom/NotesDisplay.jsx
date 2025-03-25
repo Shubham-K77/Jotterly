@@ -10,16 +10,24 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ImSpinner8 } from "react-icons/im";
-const NotesDisplay = ({ data, pinNote, loading }) => {
+const NotesDisplay = ({
+  data,
+  pinNote,
+  loading,
+  deleteNote,
+  open,
+  setOpen,
+}) => {
   let date = new Date(data.createdAt).toLocaleString();
   const theme = useSelector((state) => state.themeToggler.theme);
   return (
-    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[45vh] lg:w-[30%] lg:h-[33vh] rounded-md mb-8 border-1 border-gray-300">
+    <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[46.5vh] lg:w-[30%] lg:h-[36vh] rounded-md mb-8 border-1 border-gray-300">
       {/* Title Name And Pin */}
       <div className="w-full flex justify-around items-center mb-2 p-2 mt-2">
         <div className="ml-2 text-[1.10rem] font-semibold">{data.title}</div>
@@ -58,11 +66,13 @@ const NotesDisplay = ({ data, pinNote, loading }) => {
       </div>
       {/* Category */}
       <div
-        className={`ml-4 mb-2 flex justify-center items-center rounded-sm w-[28%] h-[6.5vh] lg:w-[20%] shadow-sm ${
+        className={`ml-4 mb-2 flex justify-center items-center rounded-sm w-[28%] h-[7.5vh] lg:h-[6.5vh] lg:w-[20%] shadow-sm ${
           theme === "light" ? "bg-sky-700" : "bg-rose-400"
         }`}
       >
-        <div className="text-[1.05rem] text-white font-semibold">IdeaBox</div>
+        <div className="text-[0.95rem] text-white font-semibold">
+          {data.categories}
+        </div>
       </div>
       {/* Tags and Icons */}
       <div className="ml-4 w-full mb-2 flex flex-col justify-start items-start lg:flex-row lg:justify-around lg:items-center">
@@ -173,6 +183,7 @@ const NotesDisplay = ({ data, pinNote, loading }) => {
               </div>
             </DialogContent>
           </Dialog>
+          {/* Edit Button */}
           <div
             className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
               theme === "light"
@@ -182,15 +193,71 @@ const NotesDisplay = ({ data, pinNote, loading }) => {
           >
             <FiEdit2 className="text-[1.35rem] font-semibold" />
           </div>
-          <div
-            className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
-              theme === "light"
-                ? "bg-sky-700 hover:bg-sky-600"
-                : "bg-rose-400 hover:bg-rose-500"
-            }`}
-          >
-            <AiOutlineDelete className="text-[1.35rem] font-semibold" />
-          </div>
+          {/* Delete Button */}
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <div
+                className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
+                  theme === "light"
+                    ? "bg-sky-700 hover:bg-sky-600"
+                    : "bg-rose-400 hover:bg-rose-500"
+                }`}
+              >
+                <AiOutlineDelete className="text-[1.35rem] font-semibold" />
+              </div>
+            </DialogTrigger>
+            <DialogContent
+              className={`${
+                theme === "light"
+                  ? "bg-gray-100 text-gray-900"
+                  : "bg-gray-900 text-gray-100"
+              }`}
+            >
+              <DialogHeader>
+                <DialogTitle>Delete Note</DialogTitle>
+                <DialogDescription className="text-[0.95rem] mt-1 font-semibold text-justify">
+                  Use this modal to permanently delete a note. This action
+                  cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-2 mb-4 flex flex-col justify-start items-start">
+                <div className="text-[1rem] font-semibold">{data.title}</div>
+                <DialogDescription className="text-[0.95rem] mt-1 font-semibold text-justify mb-2">
+                  {data.content}
+                </DialogDescription>
+                <div className="flex justify-start items-center mt-2 w-full">
+                  {data.tags &&
+                    data.tags.map((tag) => (
+                      <div
+                        className={`text-white flex justify-center items-center rounded-sm shadow-sm w-[18%] h-[5.5vh] font-semibold text-[0.95rem] mr-2 ${
+                          theme === "light" ? "bg-sky-700" : "bg-rose-400"
+                        }`}
+                        key={tag}
+                      >
+                        {tag}
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <DialogFooter className="flex justify-end items-center">
+                <div
+                  className={`mr-2 w-[38%] h-[7.5vh] lg:w-[28%] lg:h-[7.05vh] rounded-sm shadow-sm transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer text-white text-[1.20rem] font-semibold flex justify-center items-center ${
+                    theme === "light"
+                      ? "bg-sky-700 hover:bg-sky-600"
+                      : "bg-rose-400 hover:bg-rose-300"
+                  }`}
+                  onClick={() => deleteNote(data._id)}
+                >
+                  {loading === true ? (
+                    <ImSpinner8 className="animate-spin" />
+                  ) : (
+                    "Delete"
+                  )}
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {/* AI Button */}
           <div
             className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-7 lg:mr-2 ${
               theme === "light"

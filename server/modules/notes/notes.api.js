@@ -5,6 +5,7 @@ import express from "express";
 import tokenChecker from "../../middleware/tokenCheck.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 //Router:
 const noteRouter = express.Router();
 dotenv.config();
@@ -52,7 +53,7 @@ noteRouter.get("/getNotes/:userId", tokenChecker, async (req, res, next) => {
     }
     const fetchData = await noteModel
       .find({ userId: userId })
-      .sort({ isPinned: -1 });
+      .sort({ isPinned: -1, createdAt: 1 });
     if (!fetchData) {
       const error = new Error("Data Not Found In DB!");
       res.status(404); //Not-Found
@@ -180,8 +181,8 @@ noteRouter.delete("/delete", tokenChecker, async (req, res, next) => {
       return next(error);
     }
     res
-      .status(204)
-      .send({ message: "Successfully Deleted!", status: 204, deleteNote });
+      .status(200)
+      .send({ message: "Successfully Deleted!", status: 200, deleteNote });
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);
@@ -248,6 +249,60 @@ Response format:
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500);
+    next(error);
+  }
+});
+//Counting Categories:
+noteRouter.get("/count/:UserId", tokenChecker, async (req, res, next) => {
+  try {
+    const { UserId } = req.params;
+    if (!UserId) {
+      const error = new Error("Id isn't provided in the request!");
+      res.status(400); //Bad-Request
+      return next(error);
+    }
+    const userExists = await userModel.findById(UserId);
+    if (!userExists) {
+      const error = new Error("The user doesn't exist in the system!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    //Predefined Structure:
+    const categoryCount = {
+      all: 0,
+      IdeaBox: 0,
+      LifeCraft: 0,
+      StudyNest: 0,
+      ZenDen: 0,
+      WorkFlow: 0,
+    };
+    const countCategories = await noteModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(UserId) } },
+      { $group: { _id: "$categories", count: { $sum: 1 } } },
+    ]);
+    if (!countCategories) {
+      const error = new Error("Internal Query Error!");
+      res.status(500);
+      return next(error);
+    }
+    const totalDocuments = await noteModel.countDocuments({
+      userId: new mongoose.Types.ObjectId(UserId),
+    });
+    if (!totalDocuments) {
+      const error = new Error("Internal Query Error!");
+      res.status(500);
+      return next(error);
+    }
+    categoryCount["all"] = totalDocuments;
+    countCategories.forEach(
+      (category) => (categoryCount[category._id] = category.count)
+    );
+    res
+      .status(200)
+      .send({ message: "Successfully counted!", code: 200, categoryCount });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500); //Internal-Error
     next(error);
   }
 });

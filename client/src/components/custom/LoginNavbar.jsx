@@ -75,7 +75,7 @@ const LoginNavbar = () => {
     }
   };
   return (
-    <div className="w-full h-[39.5vh] lg:h-[15vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center shadow-sm border-b-2 border-gray-200">
+    <div className="w-full h-[39.5vh] lg:h-[15vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center">
       <div
         className="w-[55%] h-[14vh] mt-2 mb-2 lg:mt-0 lg:mb-0 lg:w-[15%] lg:h-[12vh] bg-transparent hover:cursor-pointer"
         title="Home Page"
