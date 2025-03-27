@@ -66,6 +66,80 @@ noteRouter.get("/getNotes/:userId", tokenChecker, async (req, res, next) => {
     next(error);
   }
 });
+//Search For Notes Using Tags:
+noteRouter.get(
+  "/searchTags/:userId/:tag",
+  tokenChecker,
+  async (req, res, next) => {
+    try {
+      const { userId, tag } = req.params;
+      if (!userId || !tag) {
+        const error = new Error("Missing required information!");
+        res.status(400); //Bad-Request
+        return next(error);
+      }
+      const userExists = await userModel.findById(userId);
+      if (!userExists) {
+        const error = new Error("User information not found in the system!");
+        res.status(404); //Not-Found
+        return next(error);
+      }
+      const notesInfo = await noteModel.find({
+        userId: userExists._id,
+        tags: {
+          $in: [new RegExp(`^${tag}`, "i"), new RegExp(`.*${tag}.*`, "i")],
+        },
+      });
+      if (!notesInfo || notesInfo.length === 0) {
+        const error = new Error("No notes information was found!");
+        res.status(404); //Not-Found
+        return next(error);
+      }
+      res
+        .status(200)
+        .send({ message: "Note was found!", code: 200, notesInfo });
+    } catch (error) {
+      error.message = "Internal Server Error!";
+      res.status(500);
+      next(error);
+    }
+  }
+);
+//Get The Notes According To Category:
+noteRouter.get(
+  "/categoryNotes/:category/:userId",
+  tokenChecker,
+  async (req, res, next) => {
+    try {
+      const { category, userId } = req.params;
+      if (!category || !userId) {
+        const error = new Error("Missing information for data access!");
+        res.status(400); //Bad-Request
+        return next(error);
+      }
+      const userExists = await userModel.findById(userId);
+      if (!userExists) {
+        const error = new Error("User doesn't exist in the system!");
+        res.status(404); //Not-Found
+        return next(error);
+      }
+      const data = await noteModel.find({
+        categories: category,
+        userId: userExists._id,
+      });
+      if (!data) {
+        const error = new Error("Data not found in the system!");
+        res.status(404); //Not-Found
+        return next(error);
+      }
+      res.status(200).send({ message: "Data found!", code: 200, data });
+    } catch (error) {
+      error.message = "Internal Server Error!";
+      res.status(500);
+      next(error);
+    }
+  }
+);
 //Create New Note:
 noteRouter.post("/create", tokenChecker, async (req, res, next) => {
   try {

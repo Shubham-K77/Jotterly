@@ -77,11 +77,11 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div
-          className={`fixed bottom-3 lg:bottom-5 lg:right-[3.5rem] right-4 mt-2 w-[14.5%] lg:w-[4%] h-[7.5vh] rounded-sm flex justify-center items-center ${
+          className={`w-[16%] lg:w-[4%] h-[7.25vh] rounded-sm shadow-sm fixed bottom-3 right-4 flex justify-center items-center hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-110 ${
             theme === "light"
               ? "bg-sky-700 hover:bg-sky-600"
               : "bg-rose-400 hover:bg-rose-300"
-          } transition-transform ease-in-out duration-150 hover:scale-110 hover:cursor-pointer`}
+          }`}
         >
           <IoAdd className="text-white text-[2.15rem] font-semibold" />
         </div>

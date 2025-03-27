@@ -15,6 +15,7 @@ const Main = () => {
   const [open, setOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [categoryCount, setCategoryCount] = useState({});
   //Create New Note:
   const create = async (title, content, category, tags) => {
     setLoading(true);
@@ -34,6 +35,8 @@ const Main = () => {
         { withCredentials: true }
       );
       setNotes(updatedNotes?.data?.fetchData);
+      //Updated Categories Count:
+      await refreshCategoryCount();
       return setLoading(false);
     } catch (error) {
       let message = error.response?.data?.message || "Internal Server Error!";
@@ -62,6 +65,43 @@ const Main = () => {
     };
     fetchData();
   }, [enqueueSnackbar, user]);
+  //Fetch Categories Count On Render:
+  useEffect(() => {
+    const countCategories = async () => {
+      try {
+        if (!user || !user._id) {
+          console.log("No user data available");
+          return null;
+        }
+        const userId = user._id;
+        const response = await axios.get(
+          `http://localhost:5555/api/v1/notes/count/${userId}`,
+          { withCredentials: true }
+        );
+        enqueueSnackbar(response?.data?.message, { variant: "success" });
+        setCategoryCount(response?.data?.categoryCount);
+      } catch (error) {
+        enqueueSnackbar(error?.response?.data?.message, { variant: "error" });
+      }
+    };
+    countCategories();
+  }, [enqueueSnackbar, user]);
+  //Update The Category Counts:
+  const refreshCategoryCount = async () => {
+    try {
+      if (!user || !user._id) {
+        console.log("No user data available");
+        return;
+      }
+      const response = await axios.get(
+        `http://localhost:5555/api/v1/notes/count/${user._id}`,
+        { withCredentials: true }
+      );
+      setCategoryCount(response?.data?.categoryCount);
+    } catch (error) {
+      enqueueSnackbar(error?.response?.data?.message, { variant: "error" });
+    }
+  };
   // Pin The Notes:
   const pinNote = async (userId, noteId) => {
     setLoading(true);
@@ -104,6 +144,8 @@ const Main = () => {
         { withCredentials: true }
       );
       setNotes(updatedNotes?.data?.fetchData);
+      //Updated Categories Count:
+      await refreshCategoryCount();
       return setLoading(false);
     } catch (error) {
       let message = error?.response?.data?.message || "Internal Server Error!";
@@ -124,7 +166,7 @@ const Main = () => {
       {/* Navigation Bar */}
       <LoginNavbar />
       {/* Categories Display */}
-      <Categories />
+      <Categories categoryCount={categoryCount} />
       {/* Banner Display */}
       <Banner
         image={"/Images/mainBanner.png"}
