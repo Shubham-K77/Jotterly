@@ -269,11 +269,27 @@ noteRouter.post("/suggest", tokenChecker, async (req, res, next) => {
     const apiUrl = process.env.gorqAIUrl;
     const apiKey = process.env.gorqAPIKey;
     const apiModel = process.env.gorqAIModel;
-    const { task, desc } = req.body;
-    if (!task || !desc) {
+    const { task, desc, postId } = req.body;
+    if (!task || !desc || !postId) {
       const error = new Error("Information is missing!");
       res.status(400); //Bad-Request
       return next(error);
+    }
+    const postExists = await noteModel.findById(postId);
+    if (!postExists) {
+      const error = new Error("No post info was found in the system!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    if (
+      postExists.suggestions &&
+      Object.keys(postExists.suggestions).length > 0
+    ) {
+      return res.status(200).send({
+        message: "AI suggestion already exists for this note!",
+        code: 200,
+        postInfo: postExists.suggestions,
+      });
     }
     const prompt = `You are an AI assistant providing helpful suggestions for completing tasks. Based on the given task title and description, provide a three concise suggestions in the following JSON format with an actionable plan to complete the task. The JSON response should include:
 
@@ -315,10 +331,22 @@ Response format:
     }
     const suggest = response.data.choices[0].message.content;
     let parsedSuggestion = JSON.parse(suggest);
+    const updateNote = await noteModel.findByIdAndUpdate(
+      postExists._id,
+      {
+        suggestions: parsedSuggestion,
+      },
+      { new: true }
+    );
+    if (!updateNote) {
+      const error = new Error("Internal db server error!");
+      res.status(500);
+      return next(error);
+    }
     res.status(200).send({
       message: "Suggestions generated!",
       code: 200,
-      suggestion: parsedSuggestion,
+      suggestion: updateNote.suggestions,
     });
   } catch (error) {
     error.message = "Internal Server Error!";

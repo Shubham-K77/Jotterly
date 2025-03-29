@@ -21,6 +21,8 @@ const NotesDisplay = ({
   pinNote,
   loading,
   deleteNote,
+  aiLoading,
+  generateSuggestion,
   open,
   setOpen,
 }) => {
@@ -111,75 +113,49 @@ const NotesDisplay = ({
               <DialogHeader>
                 {/* Notes Title Name */}
                 <DialogTitle className="w-full flex justify-center items-center font-semibold text-[1.25rem] mb-2">
-                  Visit The Doctor Today!
+                  {data.title}
                 </DialogTitle>
                 {/* Description of the note */}
                 <DialogDescription className="text-[0.95rem] font-semibold">
-                  Booked an appointment in Frontline Hospital for hand fracture
-                  that I suffered in 10th March 2025
+                  {data.content}
                 </DialogDescription>
               </DialogHeader>
               {/* For AI Suggestions! */}
-              <div className="mt-2 mb-2 w-full flex flex-col justify-start items-center">
-                <div className="mb-2 text-[1.20rem] font-semibold">
-                  AI Recommendation
+              {data.suggestions && (
+                <div className="mt-2 mb-2 w-full flex flex-col justify-start items-center">
+                  <div className="mb-2 text-[1.20rem] font-semibold">
+                    AI Recommendation
+                  </div>
+                  <div className="w-full p-2 border-1 border-gray-300 shadow-sm mt-2 mb-2 rounded-sm">
+                    <ul className="list-disc pl-4 text-justify mt-2 mb-2 text-[0.90rem] font-semibold">
+                      {data.suggestions &&
+                        data.suggestions.actionPlan.map((action) => (
+                          <li className="mb-2 mt-1" key={action}>
+                            {action}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                  <DialogDescription className="text-[0.95rem] font-semibold">
+                    {data.suggestions.suggestionText}
+                  </DialogDescription>
                 </div>
-                <div className="w-full p-2 border-1 border-gray-300 shadow-sm mt-2 mb-2 rounded-sm">
-                  <ul className="list-disc pl-4 text-justify mt-2 mb-2 text-[0.90rem] font-semibold">
-                    <li className="mb-2 mt-1">
-                      Leave early to avoid traffic and ensure timely arrival at
-                      Frontline Hospital. Prepare necessary documents (ID,
-                      medical reports) and wear comfortable clothing for easy
-                      examination.
-                    </li>
-                    <li className="mb-2">
-                      Apply a cold pack to the affected area before leaving if
-                      experiencing pain. Carry pain relief medication if
-                      prescribed. Stay hydrated and relaxed to minimize
-                      discomfort during the visit.
-                    </li>
-                    <li className="mb-2">
-                      After the appointment, follow the doctor’s advice
-                      diligently. Apply recommended ointments, take prescribed
-                      medications on time, and avoid strenuous activities to
-                      promote faster recovery.
-                    </li>
-                  </ul>
-                </div>
-                <DialogDescription className="text-[0.95rem] font-semibold">
-                  Booked an appointment in Frontline Hospital for hand fracture
-                  that I suffered in 10th March 2025
-                </DialogDescription>
-              </div>
+              )}
               {/* For Tags */}
               <div className="mt-2 mb-2 w-full flex justify-start items-center">
-                <div
-                  className={`p-2 ${
-                    theme === "light"
-                      ? "bg-sky-700 text-white"
-                      : "bg-rose-400 text-white"
-                  } font-semibold text-[0.90rem] rounded-sm shadow-sm mr-2`}
-                >
-                  #appointment
-                </div>
-                <div
-                  className={`p-2 ${
-                    theme === "light"
-                      ? "bg-sky-700 text-white"
-                      : "bg-rose-400 text-white"
-                  } font-semibold text-[0.90rem] rounded-sm shadow-sm mr-2`}
-                >
-                  #doctor
-                </div>
-                <div
-                  className={`p-2 ${
-                    theme === "light"
-                      ? "bg-sky-700 text-white"
-                      : "bg-rose-400 text-white"
-                  } font-semibold text-[0.90rem] rounded-sm shadow-sm mr-2`}
-                >
-                  #health
-                </div>
+                {data.tags &&
+                  data.tags.map((tag) => (
+                    <div
+                      className={`p-2 ${
+                        theme === "light"
+                          ? "bg-sky-700 text-white"
+                          : "bg-rose-400 text-white"
+                      } font-semibold text-[0.90rem] rounded-sm shadow-sm mr-2`}
+                      key={tag}
+                    >
+                      {tag}
+                    </div>
+                  ))}
               </div>
             </DialogContent>
           </Dialog>
@@ -264,8 +240,15 @@ const NotesDisplay = ({
                 ? "bg-sky-700 hover:bg-sky-600"
                 : "bg-rose-400 hover:bg-rose-500"
             }`}
+            onClick={() =>
+              generateSuggestion(data.title, data.content, data._id)
+            }
           >
-            <RiChatVoiceAiFill className="text-[1.35rem] font-semibold" />
+            {aiLoading === true ? (
+              <ImSpinner8 className="text-[1.35rem] font-semibold animate-spin" />
+            ) : (
+              <RiChatVoiceAiFill className="text-[1.35rem] font-semibold" />
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import { IoIosSearch } from "react-icons/io";
@@ -20,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ImSpinner8 } from "react-icons/im";
-const LoginNavbar = () => {
+const LoginNavbar = ({ searchTag, searchLoading }) => {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.themeToggler.theme);
   const userData = useSelector((state) => state.userState.userData);
@@ -28,6 +29,8 @@ const LoginNavbar = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const timeoutRef = useRef(null);
   let nameInitials = "";
   if (userLoggedIn && userData?.name) {
     const nameParts = userData.name.split(" ");
@@ -74,6 +77,16 @@ const LoginNavbar = () => {
       enqueueSnackbar(message, { variant: "error" });
     }
   };
+  //Handle Search:
+  const handleSearch = async (text) => {
+    setSearchText(text);
+    //If Previous Timeout Exists! Clear it!
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    //A New TimeoutId!
+    timeoutRef.current = setTimeout(() => {
+      searchTag(text);
+    }, 2000);
+  };
   return (
     <div className="w-full h-[39.5vh] lg:h-[15vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center">
       <div
@@ -91,7 +104,9 @@ const LoginNavbar = () => {
       <div className="w-[85%] mb-2 lg:mb-0 lg:w-[30%] h-[12vh] bg-transparent flex justify-center items-center">
         <input
           className="w-[80%] h-[8vh] rounded-md text-[1rem] font-semibold border-[0.5px] border-slate-300 p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
-          placeholder="Search Notes"
+          placeholder="Search Your Notes By Tags"
+          value={searchText}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         <div
           className={`w-[15%] lg:w-[10%] h-[7vh] rounded-sm flex justify-center items-center transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm ${
@@ -99,8 +114,13 @@ const LoginNavbar = () => {
               ? "bg-sky-700 hover:bg-sky-600"
               : "bg-rose-400 hover:bg-rose-500"
           }`}
+          onClick={() => handleSearch(searchText)}
         >
-          <IoIosSearch className="text-white font-semibold text-[1.75rem]" />
+          {searchLoading === true ? (
+            <ImSpinner8 className="text-white font-semibold text-[1.75rem] animate-spin" />
+          ) : (
+            <IoIosSearch className="text-white font-semibold text-[1.75rem]" />
+          )}
         </div>
       </div>
       <div className="w-[85%] mb-4 lg:mb-0 lg:w-[20%] h-[12vh] bg-transparent flex justify-evenly items-center">
