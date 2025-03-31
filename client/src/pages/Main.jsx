@@ -16,11 +16,11 @@ const Main = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchedNotes, setSearchedNotes] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [aiLoading, setAILoading] = useState(false);
   const [notes, setNotes] = useState([]);
   const [categoryCount, setCategoryCount] = useState({});
+  const [noteIdToDelete, setNoteIdToDelete] = useState(null);
   //Create New Note:
   const create = async (title, content, category, tags) => {
     setLoading(true);
@@ -33,7 +33,7 @@ const Main = () => {
       enqueueSnackbar(response?.data?.message || "Successfully Created!", {
         variant: "success",
       });
-      setOpen(false);
+      setOpenCreateDialog(false);
       // Fetch updated notes after pinning
       const updatedNotes = await axios.get(
         `http://localhost:5555/api/v1/notes/getNotes/${user._id}`,
@@ -46,7 +46,7 @@ const Main = () => {
     } catch (error) {
       let message = error.response?.data?.message || "Internal Server Error!";
       enqueueSnackbar(message, { variant: "error" });
-      setOpen(false);
+      setOpenCreateDialog(false);
       return setLoading(false);
     }
   };
@@ -140,7 +140,6 @@ const Main = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
-      setOpenDeleteDialog(false);
       // Fetch updated notes after deleting
       const updatedNotes = await axios.get(
         `http://localhost:5555/api/v1/notes/getNotes/${user._id}`,
@@ -149,12 +148,15 @@ const Main = () => {
       setNotes(updatedNotes?.data?.fetchData);
       //Updated Categories Count:
       await refreshCategoryCount();
+      // Clear the note ID when deletion is complete
+      setNoteIdToDelete(null);
       return setLoading(false);
     } catch (error) {
       let message = error?.response?.data?.message || "Internal Server Error!";
       enqueueSnackbar(message, { variant: "error" });
+      // Clear the note ID when deletion is complete
+      setNoteIdToDelete(null);
       setLoading(false);
-      setOpenDeleteDialog(false);
     }
   };
   //Search For Notes:
@@ -172,7 +174,7 @@ const Main = () => {
         return null;
       }
       const response = await axios.get(
-        `http://localhost:5555/api/v1/notes/searchTags/${user._id}/${searchText}`,
+        `http://localhost:5555/api/v1/notes/searchTags/${user._id}/${searchText}/all`,
         { withCredentials: true }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
@@ -182,6 +184,44 @@ const Main = () => {
       let message = error.response?.data?.message;
       enqueueSnackbar(message, { variant: "error" });
       setSearchLoading(false);
+    }
+  };
+  //Edit The Notes:
+  const editNote = async (noteId, title, content, tags, categories, userId) => {
+    setLoading(true);
+    try {
+      if (!user || !user._id) {
+        console.log("No User Information Found!");
+        return null;
+      }
+      const response = await axios.put(
+        "http://localhost:5555/api/v1/notes/editNote",
+        {
+          noteId,
+          title,
+          content,
+          tags,
+          categories,
+          userId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      enqueueSnackbar(response?.data?.message, { variant: "success" });
+      // Fetch updated notes after deleting
+      const updatedNotes = await axios.get(
+        `http://localhost:5555/api/v1/notes/getNotes/${user._id}`,
+        { withCredentials: true }
+      );
+      setNotes(updatedNotes?.data?.fetchData);
+      //Updated Categories Count:
+      await refreshCategoryCount();
+      setLoading(false);
+    } catch (error) {
+      let message = error.response?.data?.message;
+      enqueueSnackbar(message, { variant: "error" });
+      setLoading(false);
     }
   };
   //AI Suggestions:
@@ -224,8 +264,13 @@ const Main = () => {
     >
       {/* Navigation Bar */}
       <LoginNavbar searchTag={searchTag} searchLoading={searchLoading} />
+      {/* Important Message */}
+      <div className="text-[1rem] font-semibold mb-4 text-justify w-[90%] lg:text-center">
+        Find notes by tags! When inside a category, search within it. On the
+        main page, search across all notes.
+      </div>
       {/* Categories Display */}
-      <Categories categoryCount={categoryCount} />
+      <Categories categoryCount={categoryCount} category={"All"} />
       {/* Banner Display */}
       <Banner
         image={"/Images/mainBanner.png"}
@@ -273,8 +318,10 @@ const Main = () => {
                 aiLoading={aiLoading}
                 deleteNote={deleteNote}
                 generateSuggestion={generateSuggestion}
-                open={openDeleteDialog}
-                setOpen={setOpenDeleteDialog}
+                editNote={editNote}
+                isDeleteDialogOpen={noteIdToDelete === note._id}
+                openDeleteDialog={(id) => setNoteIdToDelete(id)}
+                closeDeleteDialog={() => setNoteIdToDelete(null)}
               />
             ))}
           </div>
@@ -306,8 +353,10 @@ const Main = () => {
               deleteNote={deleteNote}
               aiLoading={aiLoading}
               generateSuggestion={generateSuggestion}
-              open={openDeleteDialog}
-              setOpen={setOpenDeleteDialog}
+              editNote={editNote}
+              isDeleteDialogOpen={noteIdToDelete === note._id}
+              openDeleteDialog={(id) => setNoteIdToDelete(id)}
+              closeDeleteDialog={() => setNoteIdToDelete(null)}
             />
           ))}
         </div>
@@ -332,8 +381,8 @@ const Main = () => {
         theme={theme}
         create={create}
         loading={loading}
-        open={open}
-        setOpen={setOpen}
+        openCreateDialog={openCreateDialog}
+        setOpenCreateDialog={setOpenCreateDialog}
       />
     </div>
   );

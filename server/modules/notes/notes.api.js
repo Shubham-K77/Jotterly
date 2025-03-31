@@ -68,12 +68,12 @@ noteRouter.get("/getNotes/:userId", tokenChecker, async (req, res, next) => {
 });
 //Search For Notes Using Tags:
 noteRouter.get(
-  "/searchTags/:userId/:tag",
+  "/searchTags/:userId/:tag/:category",
   tokenChecker,
   async (req, res, next) => {
     try {
-      const { userId, tag } = req.params;
-      if (!userId || !tag) {
+      const { userId, tag, category } = req.params;
+      if (!userId || !tag || !category) {
         const error = new Error("Missing required information!");
         res.status(400); //Bad-Request
         return next(error);
@@ -84,12 +84,16 @@ noteRouter.get(
         res.status(404); //Not-Found
         return next(error);
       }
-      const notesInfo = await noteModel.find({
+      let query = {
         userId: userExists._id,
         tags: {
           $in: [new RegExp(`^${tag}`, "i"), new RegExp(`.*${tag}.*`, "i")],
         },
-      });
+      };
+      if (category !== "all") {
+        query.categories = category;
+      }
+      const notesInfo = await noteModel.find(query);
       if (!notesInfo || notesInfo.length === 0) {
         const error = new Error("No notes information was found!");
         res.status(404); //Not-Found
@@ -405,6 +409,46 @@ noteRouter.get("/count/:UserId", tokenChecker, async (req, res, next) => {
   } catch (error) {
     error.message = "Internal Server Error!";
     res.status(500); //Internal-Error
+    next(error);
+  }
+});
+//Edit Notes:
+noteRouter.put("/editNote", tokenChecker, async (req, res, next) => {
+  try {
+    const { noteId, title, content, tags, categories, userId } = req.body;
+    const userExists = await userModel.findById(userId);
+    if (!userExists) {
+      const error = new Error("User doesn't exist in the system!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    const noteExists = await noteModel.findOne({ _id: noteId, userId });
+    if (!noteExists) {
+      const error = new Error("Note doesn't exist in the system!");
+      res.status(404); //Not-Found
+      return next(error);
+    }
+    const updateNote = await noteModel.findByIdAndUpdate(
+      noteExists._id,
+      {
+        title,
+        content,
+        tags,
+        categories,
+      },
+      { new: true }
+    );
+    if (!updateNote) {
+      const error = new Error("Internal DB Error!");
+      res.status(500); //Internal-Error
+      return next(error);
+    }
+    res
+      .status(200)
+      .send({ message: "Successfully Updated!", code: 200, updateNote });
+  } catch (error) {
+    error.message = "Internal Server Error!";
+    res.status(500);
     next(error);
   }
 });

@@ -85,7 +85,7 @@ const LoginNavbar = ({ searchTag, searchLoading }) => {
     //A New TimeoutId!
     timeoutRef.current = setTimeout(() => {
       searchTag(text);
-    }, 2000);
+    }, 1000);
   };
   return (
     <div className="w-full h-[39.5vh] lg:h-[15vh] flex flex-col justify-start items-center lg:flex-row lg:justify-around lg:items-center">

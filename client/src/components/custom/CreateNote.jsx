@@ -13,7 +13,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-const CreateNote = ({ theme, create, loading, open, setOpen }) => {
+const CreateNote = ({
+  theme,
+  create,
+  loading,
+  openCreateDialog,
+  setOpenCreateDialog,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -74,7 +80,7 @@ const CreateNote = ({ theme, create, loading, open, setOpen }) => {
     setTags([]);
   };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
       <DialogTrigger asChild>
         <div
           className={`w-[16%] lg:w-[4%] h-[7.25vh] rounded-sm shadow-sm fixed bottom-3 right-4 flex justify-center items-center hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-110 ${

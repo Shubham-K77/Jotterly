@@ -1,10 +1,14 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import { GoPin } from "react-icons/go";
 import { FiEdit2 } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
 import { MdRemoveRedEye } from "react-icons/md";
 import { RiChatVoiceAiFill } from "react-icons/ri";
 import { useSelector } from "react-redux";
+import { IoMdClose } from "react-icons/io";
+import { IoAdd } from "react-icons/io5";
 //Dialog Component Shad-CN
 import {
   Dialog,
@@ -16,6 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ImSpinner8 } from "react-icons/im";
+import { enqueueSnackbar } from "notistack";
 const NotesDisplay = ({
   data,
   pinNote,
@@ -23,11 +28,47 @@ const NotesDisplay = ({
   deleteNote,
   aiLoading,
   generateSuggestion,
-  open,
-  setOpen,
+  editNote,
+  isDeleteDialogOpen,
+  openDeleteDialog,
+  closeDeleteDialog,
 }) => {
   let date = new Date(data.createdAt).toLocaleString();
   const theme = useSelector((state) => state.themeToggler.theme);
+  const [title, setTitle] = useState(data?.title);
+  const [content, setContent] = useState(data?.content);
+  const [categories, setCategories] = useState(data?.categories);
+  const [tags, setTags] = useState(data?.tags);
+  const [individualTag, setIndividualTag] = useState("");
+  const removeTag = (value) => {
+    //Removes The Selected Tag From The Array!
+    setTags(tags.filter((tag) => tag !== value));
+  };
+  const addTag = (value) => {
+    //Check Length Of Individual Tag:
+    if (value.length <= 3 || value.length > 12) {
+      enqueueSnackbar("Please enter a tag between 3-12 characters!", {
+        variant: "info",
+      });
+      return null;
+    }
+    //Check Length Of Tags:
+    if (tags.length >= 3) {
+      enqueueSnackbar("You can add only up to 3 tags to organize your note!", {
+        variant: "info",
+      });
+      return null;
+    }
+    //Check For Redundant Tags:
+    if (tags.includes("#" + value)) {
+      enqueueSnackbar("This tag already exists!", { variant: "info" });
+      return;
+    }
+    //Adds The New Tag Into The Array!
+    setTags([...tags, "#" + value]);
+    //Reset The Previous One!
+    setIndividualTag("");
+  };
   return (
     <div className="flex flex-col justify-start items-start transition-transform ease-in-out duration-150 hover:scale-105 hover:cursor-pointer shadow-sm w-[95%] h-[46.5vh] lg:w-[30%] lg:h-[36vh] rounded-md mb-8 border-1 border-gray-300">
       {/* Title Name And Pin */}
@@ -160,17 +201,7 @@ const NotesDisplay = ({
             </DialogContent>
           </Dialog>
           {/* Edit Button */}
-          <div
-            className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
-              theme === "light"
-                ? "bg-sky-700 hover:bg-sky-600"
-                : "bg-rose-400 hover:bg-rose-500"
-            }`}
-          >
-            <FiEdit2 className="text-[1.35rem] font-semibold" />
-          </div>
-          {/* Delete Button */}
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog>
             <DialogTrigger asChild>
               <div
                 className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
@@ -178,6 +209,149 @@ const NotesDisplay = ({
                     ? "bg-sky-700 hover:bg-sky-600"
                     : "bg-rose-400 hover:bg-rose-500"
                 }`}
+              >
+                <FiEdit2 className="text-[1.35rem] font-semibold" />
+              </div>
+            </DialogTrigger>
+            <DialogContent
+              className={`${
+                theme === "light"
+                  ? "bg-gray-100 text-gray-900"
+                  : "bg-gray-900 text-gray-100"
+              }`}
+            >
+              <DialogHeader className="mb-2">
+                <DialogTitle>Update Note Details</DialogTitle>
+                <DialogDescription className="text-[0.90rem] font-semibold mt-2">
+                  Make changes to your note's title, content, tags, and
+                  categories. Click save when you're done.
+                </DialogDescription>
+              </DialogHeader>
+              {/* For Title */}
+              <input
+                className="w-[85%] h-[6.5vh] text-[0.90rem] font-semibold rounded-sm mb-1 border-1 border-gray-300 p-1.5 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              {/* For Description */}
+              <textarea
+                className="rounded-sm border-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 text-[0.90rem] p-2.5 font-semibold text-justify"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={6}
+                cols={15}
+              ></textarea>
+              {/* Count For Description */}
+              <div className="w-full flex justify-end items-center">
+                <div className="font-semibold text-[0.80rem]">
+                  {content.length}/500
+                </div>
+              </div>
+              {/* Options For Categories */}
+              <select
+                className={`border-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 p-1 rounded-sm mb-2 h-[6.5vh] ${
+                  theme === "light"
+                    ? "bg-gray-100 text-gray-900"
+                    : "bg-gray-900 text-gray-100"
+                }`}
+                value={categories}
+                onChange={(e) => setCategories(e.target.value)}
+              >
+                <option value="IdeaBox">IdeaBox💡</option>
+                <option value="LifeCraft">LifeCraft⛺</option>
+                <option value="StudyNest">StudyNest🧠</option>
+                <option value="ZenDen">ZenDen☮️</option>
+                <option value="WorkFlow">WorkFlow💼</option>
+              </select>
+              {/* Tags */}
+              {tags && (
+                <div className="w-full flex justify-start items-center">
+                  {tags.map((tag) => (
+                    <div
+                      className={`w-[35%] h-[5.5vh] lg:w-[25%] lg:h-[5vh] text-white rounded-sm flex justify-around items-center mr-2 transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer ${
+                        theme === "light"
+                          ? "bg-sky-700 hover:bg-sky-600"
+                          : "bg-rose-400 hover:bg-rose-500"
+                      }`}
+                      key={tag}
+                    >
+                      <div className="font-semibold text-[0.95rem]">{tag}</div>
+                      <IoMdClose
+                        className="font-semibold text-[1.10rem]"
+                        onClick={() => removeTag(tag)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Add Tag Input */}
+              <div className="w-full flex justify-start items-center">
+                <input
+                  type="text"
+                  className="rounded-sm lg:h-[5.5vh] w-[60%] h-[6.5vh] lg:w-[40%] border-1 border-gray-300 p-1.5 text-[0.85rem] font-semibold mr-2 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
+                  value={individualTag}
+                  placeholder="Add a new tag"
+                  onChange={(e) => setIndividualTag(e.target.value)}
+                />
+                <div
+                  className={`flex justify-center items-center text-white hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-105 w-[12%] h-[5.5vh] lg:w-[8%] lg:h-[4.5vh] rounded-sm ${
+                    theme === "light"
+                      ? "bg-sky-700 hover:bg-sky-600"
+                      : "bg-rose-400 hover:bg-rose-500"
+                  }`}
+                  onClick={() => addTag(individualTag)}
+                >
+                  <IoAdd className="text-[1.75rem] font-semibold" />
+                </div>
+              </div>
+              {/* Tag Length Counter */}
+              <div className="text-[0.85rem] font-semibold ml-1">
+                {individualTag.length}/12
+              </div>
+              {/* To Call The API */}
+              <DialogFooter>
+                <div
+                  className={`w-[45%] h-[8vh] lg:w-[28%] lg:h-[6.5vh] rounded-sm shadow-sm text-white flex justify-center items-center font-semibold text-[1.05rem] ${
+                    theme === "light"
+                      ? "bg-sky-700 hover:bg-sky-600"
+                      : "bg-rose-400 hover:bg-rose-500"
+                  } hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-110`}
+                  onClick={() =>
+                    editNote(
+                      data?._id,
+                      title,
+                      content,
+                      tags,
+                      categories,
+                      data?.userId
+                    )
+                  }
+                >
+                  {loading === true ? (
+                    <ImSpinner8 className="animate-spin" />
+                  ) : (
+                    "Save Changes"
+                  )}
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {/* Delete Button */}
+          <Dialog
+            open={isDeleteDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) closeDeleteDialog();
+              else openDeleteDialog(data._id);
+            }}
+          >
+            <DialogTrigger asChild>
+              <div
+                className={`flex justify-center items-center transition-transform ease-in-out duration-150 hover:scale-120 w-[15%] h-[6.5vh] lg:w-[14%] lg:h-[5vh] text-white rounded-sm mr-4 lg:mr-2 ${
+                  theme === "light"
+                    ? "bg-sky-700 hover:bg-sky-600"
+                    : "bg-rose-400 hover:bg-rose-500"
+                }`}
+                onClick={() => openDeleteDialog(data._id)}
               >
                 <AiOutlineDelete className="text-[1.35rem] font-semibold" />
               </div>

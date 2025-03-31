@@ -6,6 +6,10 @@ import Verify from "./pages/Verify";
 import Reset from "./pages/Reset";
 import Main from "./pages/Main";
 import StudyNest from "./pages/StudyNest";
+import ZenDen from "./pages/ZenDen";
+import IdeaBox from "./pages/IdeaBox";
+import LifeCraft from "./pages/LifeCraft";
+import WorkFlow from "./pages/WorkFlow";
 const App = () => {
   return (
     <Routes>
@@ -14,7 +18,11 @@ const App = () => {
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/main" element={<Main />} />
-      <Route path="/study" element={<StudyNest />} />
+      <Route path="/studynest" element={<StudyNest />} />
+      <Route path="/zenden" element={<ZenDen />} />
+      <Route path="/ideabox" element={<IdeaBox />} />
+      <Route path="/lifecraft" element={<LifeCraft />} />
+      <Route path="/workflow" element={<WorkFlow />} />
       <Route path="/reset/:id" element={<Reset />} />
     </Routes>
   );
