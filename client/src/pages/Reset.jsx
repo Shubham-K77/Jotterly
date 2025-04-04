@@ -42,7 +42,7 @@ const Reset = () => {
         return enqueueSnackbar("Password Didn't Match!", { variant: "error" });
       }
       const response = await axios.put(
-        `http://localhost:5555/api/v1/users/reset/${resetCode}`,
+        `https://jotterly-api.vercel.app/api/v1/users/reset/${resetCode}`,
         { password }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });

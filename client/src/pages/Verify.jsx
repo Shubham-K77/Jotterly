@@ -44,7 +44,7 @@ const Verify = () => {
         });
       }
       const response = await axios.post(
-        "http://localhost:5555/api/v1/users/sendMail",
+        "https://jotterly-api.vercel.app/api/v1/users/sendMail",
         { name, email }
       );
       enqueueSnackbar(response.data.message, { variant: "success" });
@@ -67,7 +67,7 @@ const Verify = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:5555/api/v1/users/validate",
+        "https://jotterly-api.vercel.app/api/v1/users/validate",
         { name, email, otpValue }
       );
       let verify = response?.data?.verify;

@@ -44,7 +44,7 @@ const LoginNavbar = ({ searchTag, searchLoading }) => {
       try {
         setLoading(true);
         let response = await axios.get(
-          "http://localhost:5555/api/v1/users/userInfo",
+          "https://jotterly-api.vercel.app/api/v1/users/userInfo",
           { withCredentials: true }
         );
         dispatch(loggedInUser(response.data.userExists));
@@ -63,7 +63,7 @@ const LoginNavbar = ({ searchTag, searchLoading }) => {
     try {
       setLoading(true);
       let response = await axios.post(
-        "http://localhost:5555/api/v1/users/logout",
+        "https://jotterly-api.vercel.app/api/v1/users/logout",
         {},
         { withCredentials: true }
       );

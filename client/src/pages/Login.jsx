@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     const retrieveUserInfo = async () => {
       let response = await axios.get(
-        "http://localhost:5555/api/v1/users/userInfo",
+        "https://jotterly-api.vercel.app/api/v1/users/userInfo",
         { withCredentials: true }
       );
       if (response) {
@@ -35,7 +35,7 @@ const Login = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:5555/api/v1/users/login",
+        "https://jotterly-api.vercel.app/api/v1/users/login",
         { email, password },
         { withCredentials: true }
       );

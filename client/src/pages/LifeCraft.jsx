@@ -29,7 +29,7 @@ const LifeCraft = () => {
           return null;
         }
         const response = await axios.get(
-          `http://localhost:5555/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
+          `https://jotterly-api.vercel.app/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
           { withCredentials: true }
         );
         setNotes(response?.data?.data);
@@ -49,7 +49,7 @@ const LifeCraft = () => {
         }
         const userId = user._id;
         const response = await axios.get(
-          `http://localhost:5555/api/v1/notes/count/${userId}`,
+          `https://jotterly-api.vercel.app/api/v1/notes/count/${userId}`,
           { withCredentials: true }
         );
         setCategoryCount(response?.data?.categoryCount);
@@ -67,7 +67,7 @@ const LifeCraft = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:5555/api/v1/notes/count/${user._id}`,
+        `https://jotterly-api.vercel.app/api/v1/notes/count/${user._id}`,
         { withCredentials: true }
       );
       setCategoryCount(response?.data?.categoryCount);
@@ -80,7 +80,7 @@ const LifeCraft = () => {
     setLoading(true);
     try {
       const response = await axios.patch(
-        "http://localhost:5555/api/v1/notes/pinNote",
+        "https://jotterly-api.vercel.app/api/v1/notes/pinNote",
         { userId, noteId },
         { withCredentials: true }
       );
@@ -91,7 +91,7 @@ const LifeCraft = () => {
         return null;
       }
       const updatedNotes = await axios.get(
-        `http://localhost:5555/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
+        `https://jotterly-api.vercel.app/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
         { withCredentials: true }
       );
       setNotes(updatedNotes?.data?.data);
@@ -107,7 +107,7 @@ const LifeCraft = () => {
     setLoading(true);
     try {
       const response = await axios.delete(
-        "http://localhost:5555/api/v1/notes/delete",
+        "https://jotterly-api.vercel.app/api/v1/notes/delete",
         {
           data: { postId },
           withCredentials: true,
@@ -120,7 +120,7 @@ const LifeCraft = () => {
         return null;
       }
       const updatedNotes = await axios.get(
-        `http://localhost:5555/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
+        `https://jotterly-api.vercel.app/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
         { withCredentials: true }
       );
       setNotes(updatedNotes?.data?.data);
@@ -146,7 +146,7 @@ const LifeCraft = () => {
         return null;
       }
       const response = await axios.put(
-        "http://localhost:5555/api/v1/notes/editNote",
+        "https://jotterly-api.vercel.app/api/v1/notes/editNote",
         {
           noteId,
           title,
@@ -161,7 +161,7 @@ const LifeCraft = () => {
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
       const updatedNotes = await axios.get(
-        `http://localhost:5555/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
+        `https://jotterly-api.vercel.app/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
         { withCredentials: true }
       );
       setNotes(updatedNotes?.data?.data);
@@ -179,7 +179,7 @@ const LifeCraft = () => {
     setAILoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5555/api/v1/notes/suggest",
+        "https://jotterly-api.vercel.app/api/v1/notes/suggest",
         {
           task: title,
           desc: content,
@@ -193,7 +193,7 @@ const LifeCraft = () => {
         return null;
       }
       const updatedNote = await axios.get(
-        `http://localhost:5555/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
+        `https://jotterly-api.vercel.app/api/v1/notes/categoryNotes/LifeCraft/${user._id}`,
         { withCredentials: true }
       );
       setNotes(updatedNote?.data?.data);
@@ -219,7 +219,7 @@ const LifeCraft = () => {
         return null;
       }
       const response = await axios.get(
-        `http://localhost:5555/api/v1/notes/searchTags/${user._id}/${searchText}/LifeCraft`,
+        `https://jotterly-api.vercel.app/api/v1/notes/searchTags/${user._id}/${searchText}/LifeCraft`,
         { withCredentials: true }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
