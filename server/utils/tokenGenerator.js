@@ -13,10 +13,10 @@ const generate = (req, res, payload) => {
   };
   const token = jwt.sign(tokenPayload, secret, { expiresIn: "1h" });
   res.cookie("userToken", token, {
-    httpOnly: true, //HTTP-ONLY
-    secure: false, //Development
-    maxAge: 3600000, //1h
-    sameSite: "Strict", //CSRF
+    httpOnly: true,
+    secure: true, // ✅ Required for HTTPS
+    sameSite: "None", // ✅ Allows cross-site cookies
+    maxAge: 3600000, // 1 hour
   });
 };
 
