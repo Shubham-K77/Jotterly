@@ -23,7 +23,7 @@ const App = () => {
       <Route path="/ideabox" element={<IdeaBox />} />
       <Route path="/lifecraft" element={<LifeCraft />} />
       <Route path="/workflow" element={<WorkFlow />} />
-      <Route path="/reset/:id" element={<Reset />} />
+      <Route path="/verify/reset/:id" element={<Reset />} />
     </Routes>
   );
 };
